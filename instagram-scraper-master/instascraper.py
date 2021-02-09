@@ -112,6 +112,7 @@ class Insta_Info_Scraper:
                 self.email.append(email)
                 self.driver.get(url)
                 time.sleep(2)
+        self.generate_csv()
         print("--------------Top Posters Completed!-----------------")
         print("")
 
@@ -167,6 +168,7 @@ class Insta_Info_Scraper:
                     actions.move_to_element(div).perform()
 
         print("--------------Recent Posters Completed!-----------------")
+        self.generate_csv()
 
 
 
@@ -184,7 +186,6 @@ class Insta_Info_Scraper:
             hashtag=[hashtag]
         for i in hashtag:
             self.getinfo(i)
-        self.generate_csv()
         
         
 
