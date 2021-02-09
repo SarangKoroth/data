@@ -171,9 +171,14 @@ class Insta_Info_Scraper:
         except:
             print("Error! Check your internet")
 
+        div = self.driver.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[2]/div/div[11][1]')
+        actions = ActionChains(self.driver)
+        actions.move_to_element(div).perform()
+
         try:
             for i in range(11,21):
                 for j in range(1,4):
+
                     xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
                     xpath += str(i)
                     xpath += ']/div['
@@ -219,6 +224,10 @@ class Insta_Info_Scraper:
                         actions.move_to_element(div).perform()
         except:
             print("Error! Check your internet")
+
+        div = self.driver.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[2]/div/div[21][1]')
+        actions = ActionChains(self.driver)
+        actions.move_to_element(div).perform()
 
         try:
             for i in range(21,31):
@@ -269,6 +278,10 @@ class Insta_Info_Scraper:
         except:
             print("Error! Check your internet")
 
+        div = self.driver.find_element_by_xpath('//*[@id="react-root"]/section/main/article/div[2]/div/div[31][1]')
+        actions = ActionChains(self.driver)
+        actions.move_to_element(div).perform()
+
         try:
             for i in range(31,34):
                 for j in range(1,4):
@@ -311,10 +324,6 @@ class Insta_Info_Scraper:
                     self.driver.get(url)
                     time.sleep(2)
 
-                    if i>24:
-                        div = self.driver.find_element_by_xpath(xpath)
-                        actions = ActionChains(self.driver)
-                        actions.move_to_element(div).perform()
         except:
             print("Error! Check your internet")
 
