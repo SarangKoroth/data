@@ -7,6 +7,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 # Creating a class
@@ -39,8 +40,13 @@ class Insta_Info_Scraper:
         self.driver.get("https://www.instagram.com/accounts/login/")
 
         self.driver.implicitly_wait(15)
-        self.driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[1]/div/label/input').send_keys(inp)
+        
+        
+        usrname=self.driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[1]/div/label/input')
+        usrname.send_keys(inp)
+
         time.sleep(10)
+        
         pswrd = self.driver.find_element_by_xpath('//*[@id="loginForm"]/div/div[2]/div/label/input')
         pswrd.send_keys(password)
         time.sleep(10)
@@ -101,16 +107,19 @@ class Insta_Info_Scraper:
                 print(posts)
                 print('Email:',list(set(email)))
                 print ('--------------Scraping completed!-----------------')
+                print("")
 
                 self.email.append(email)
                 self.driver.get(url)
                 time.sleep(2)
         print("--------------Top Posters Completed!-----------------")
+        print("")
 
         print("--------------Recent Posters in "+hashtag+"-----------------")
 
-        for i in range(1,33):
+        for i in range(1,34):
             for j in range(1,4):
+
                 xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
                 xpath += str(i)
                 xpath += ']/div['
@@ -149,6 +158,17 @@ class Insta_Info_Scraper:
                 self.email.append(email)
                 self.driver.get(url)
                 time.sleep(2)
+
+                if i>4:
+
+                    div = self.driver.find_element_by_xpath(xpath)
+
+                    actions = ActionChains(self.driver)
+                    actions.move_to_element(div).perform()
+
+        print("--------------Recent Posters Completed!-----------------")
+
+
 
         
 
