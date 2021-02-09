@@ -13,9 +13,9 @@ import pymongo
 import ast
 # from selenium.webdriver import ActionChains
 
-# New Input : python LinkedinMsgSent.py <Email> <Password> <Keyword> <Geography> <Relationship in quotes separted by spaces> <MessageSend> <Now Empty list for url> <Limit(count)>
+# New Input : python LinkedinMsgSent.py <Email> <Password> <Keyword> <Geography> <Relationship in quotes separted by spaces> <MessageSend> <Now Empty list for url> <StartPage> <Limit(count)>
 
-# New Input : python LinkedinMsgSent.py email@gmail.com password python India "2 3" "I have a great job offer for you" "" 5
+# New Input : python LinkedinMsgSent.py email@gmail.com password python India "2 3" "I have a great job offer for you" "" 3 5
 
 # Input : python LinkedinMsgSent.py email@gmail.com password HelloWorld "['https://www.linkedin.com/in/nooras-fatima-ansari-2542b3171/', 'https://www.linkedin.com/in/daniel-piersch-ba003b71/'] 0
 
@@ -29,7 +29,7 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 driver = webdriver.Chrome(r'/usr/local/bin/chromedriver', options=chrome_options)
-# driver = webdriver.Chrome(options=chrome_options)
+#driver = webdriver.Chrome(options=chrome_options)
 
 #Taking Input
 # EmailId = 'donnybegins@gmail.com'
@@ -60,7 +60,11 @@ MessageSend = sys.argv[6]
 url = sys.argv[7]
 url = url.split()
 
-Limit = int(sys.argv[8])
+#Page = 3
+Page = int(sys.argv[8])
+print(Page, type(Page))
+
+Limit = int(sys.argv[9])
 
 #print(EmailId, " ", Password, " ", KeyWord, " ", Geography, " ", Relationship, " ",  MessageSend, " ", url, " ", Limit)
 
@@ -159,8 +163,9 @@ def LinkedInMsg():
 
     #Finding 
     try: 
+        global Page
         # Python Script That Sends Messages To 2nd & 3rd Degree Connections (Geography +) In Linkedin Sales Navigator
-        if KeyWord and Geography and Relationship and MessageSend and Limit:
+        if KeyWord and Geography and Relationship and MessageSend and Limit and Page:
 
             #Linkedin Sales Navigator
             driver.get('https://www.linkedin.com/sales/homepage')
@@ -218,7 +223,20 @@ def LinkedInMsg():
             sleep(2)
             try:
                 count = 0
-                page = 2 #bydafault page 1 is loaded
+                checkConnectionCount = 0
+                # page = 2 #bydafault page 1 is loaded
+                print(Page, type(Page))
+
+                if Page > 1:
+                    oldPage = "page="+str(1)
+                    newPage = "page="+str(Page)
+                    link = driver.current_url
+                    link = link.replace(oldPage, newPage)
+                    driver.get(link)
+                    sleep(7)
+                    ol = driver.find_element_by_xpath("//*[@class='search-results__result-list']")
+                    sleep(2)
+                    print("Page : ", Page)
                 while count < Limit:
                     sleep(5)
                     print("Invitation sending is in progress...")
@@ -227,6 +245,8 @@ def LinkedInMsg():
                     length = driver.execute_script("return document.documentElement.scrollHeight")
                     scrollLength = 150
                     driver.execute_script("window.scrollTo(0, 0)")
+
+                    flag = 0
 
                     #Going through all tab of connection profile
                     for x in ol.find_elements_by_xpath("./li"):
@@ -272,6 +292,14 @@ def LinkedInMsg():
                                             sleep(2)
 
                                             print("--- Send Invitation successfully(Tab) ---")
+
+                                            print("Count : ", count)
+                                            
+                                            if count + 1 < Limit:
+                                                count += 1
+                                            else:
+                                                flag = 1
+                                                break
                                             break
                                     except:
                                         print("--Error while sending invitation from tab--")
@@ -323,6 +351,13 @@ def LinkedInMsg():
                                                 buttonSend.click()
                                                 sleep(2)
                                                 print("--- Send Invitation successfully ---")
+
+                                                print("Count : ", count)
+                                                if count + 1 < Limit:
+                                                    count += 1
+                                                else:
+                                                    flag = 1
+                                                    break
                                                 break
 
                                             #For pending
@@ -371,15 +406,15 @@ def LinkedInMsg():
                             print("-- Unsuccessfull, Invitation Can't send --")
                             # traceback.print_exc()
 
-                        print("Count : ", count)
-                        if count + 1 < Limit:
-                            count += 1
-                        else:
+                        print("checkConnectionCount : ", checkConnectionCount)
+                        if flag == 1:
                             break
+                        else:
+                            checkConnectionCount += 1
 
                     if count +1 < Limit:
-                        oldPage = "page="+str(page-1)
-                        newPage = "page="+str(page)
+                        oldPage = "page="+str(Page-1)
+                        newPage = "page="+str(Page)
                         link = driver.current_url
                         link = link.replace(oldPage, newPage)
                         # link = "https://www.linkedin.com/sales/search/people?doFetchHeroCard=false&geoIncluded=102713980&keywords=python&logHistory=false&page="+ str(page)+ "&preserveScrollPosition=false&relationship=S%2CO&rsLogId=770008140&searchSessionId=jh8CsJ15Sl2Qx4QQTraN7g%3D%3D"
@@ -387,8 +422,8 @@ def LinkedInMsg():
                         sleep(7)
                         ol = driver.find_element_by_xpath("//*[@class='search-results__result-list']")
                         sleep(2)
-                        print("Page : " , page)
-                        page += 1
+                        print("Page : " , Page)
+                        Page += 1
                     else:
                         print("Limit Is Reached... Invitation Send Stopped...")
                         break

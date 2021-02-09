@@ -301,7 +301,8 @@ def send_connection_request():
     keyword = sys.argv[4]
     location = sys.argv[5]
     message = sys.argv[6]
-    limit = int(sys.argv[7])
+    page = sys.argv[7]
+    limit = int(sys.argv[8])
     sleeps = [2,3,4]
     print(Email_id)
     print(Password)
@@ -371,7 +372,7 @@ def send_connection_request():
     print(pagination)
     pagination
     count = 1
-    page = 1
+    # page = 1
     data = []
     while count <= limit:
     
