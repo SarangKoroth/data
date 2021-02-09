@@ -71,108 +71,258 @@ class Insta_Info_Scraper:
         
         print("--------------Top Posters in "+hashtag+"-----------------")
 
-        for i in range(1,4):
-            for j in range(1,4):
-                xpath='//*[@id="react-root"]/section/main/article/div[1]/div/div/div['
-                xpath += str(i)
-                xpath += ']/div['
-                xpath+=str(j)
-                xpath+=']'
-                self.driver.find_element_by_xpath(xpath).click()
-                pxpath='//span/a[@tabindex="0"]'
-                self.driver.find_element_by_xpath(pxpath).click()
-                time.sleep(10)
+        try:
+            for i in range(1,4):
+                for j in range(1,4):
+                    xpath='//*[@id="react-root"]/section/main/article/div[1]/div/div/div['
+                    xpath += str(i)
+                    xpath += ']/div['
+                    xpath+=str(j)
+                    xpath+=']'
+                    self.driver.find_element_by_xpath(xpath).click()
+                    pxpath='//span/a[@tabindex="0"]'
+                    self.driver.find_element_by_xpath(pxpath).click()
+                    time.sleep(10)
 
 
-                self.driver.get(self.driver.current_url)
-                html=self.driver.page_source
-                time.sleep(2)
-                #print(html)
+                    self.driver.get(self.driver.current_url)
+                    html=self.driver.page_source
+                    time.sleep(2)
+                    #print(html)
 
-                title1=html.find('<title>')
-                title2=html.find('</title>')
+                    title1=html.find('<title>')
+                    title2=html.find('</title>')
 
-                content1=html.find('<meta content="')
-                content2=html.find('See Instagram')
-                content=html[content1+15:content2-2].split(', ')
+                    content1=html.find('<meta content="')
+                    content2=html.find('See Instagram')
+                    content=html[content1+15:content2-2].split(', ')
 
-                followers=content[0]
-                following=content[1]
-                posts=content[2]
+                    followers=content[0]
+                    following=content[1]
+                    posts=content[2]
 
-                email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
-                print('User:',html[title1+7:title2-29])
-                print(followers)
-                print(following)
-                print(posts)
-                print('Email:',list(set(email)))
-                print ('--------------Scraping completed!-----------------')
-                print("")
+                    email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
+                    print('User:',html[title1+7:title2-29])
+                    print(followers)
+                    print(following)
+                    print(posts)
+                    print('Email:',list(set(email)))
+                    print ('--------------Scraping completed!-----------------')
+                    print("")
 
-                self.email.append(email)
-                self.driver.get(url)
-                time.sleep(2)
-        self.generate_csv()
+                    self.email.append(email)
+                    self.driver.get(url)
+                    time.sleep(2)
+                    
+        except:
+            print("Error! Check your internet")
+
         print("--------------Top Posters Completed!-----------------")
         print("")
 
         print("--------------Recent Posters in "+hashtag+"-----------------")
 
-        for i in range(1,34):
-            for j in range(1,4):
+        try:
+            for i in range(1,11):
+                for j in range(1,4):
+                    xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
+                    xpath += str(i)
+                    xpath += ']/div['
+                    xpath+=str(j)
+                    xpath+=']'
+                    self.driver.find_element_by_xpath(xpath).click()
+                    pxpath='//span/a[@tabindex="0"]'
+                    self.driver.find_element_by_xpath(pxpath).click()
+                    time.sleep(10)
 
-                xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
-                xpath += str(i)
-                xpath += ']/div['
-                xpath+=str(j)
-                xpath+=']'
-                self.driver.find_element_by_xpath(xpath).click()
-                pxpath='//span/a[@tabindex="0"]'
-                self.driver.find_element_by_xpath(pxpath).click()
-                time.sleep(10)
+
+                    self.driver.get(self.driver.current_url)
+                    html=self.driver.page_source
+                    time.sleep(2)
+                    #print(html)
+
+                    title1=html.find('<title>')
+                    title2=html.find('</title>')
+
+                    content1=html.find('<meta content="')
+                    content2=html.find('See Instagram')
+                    content=html[content1+15:content2-2].split(', ')
+
+                    followers=content[0]
+                    following=content[1]
+                    posts=content[2]
+
+                    email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
+                    print('User:',html[title1+7:title2-29])
+                    print(followers)
+                    print(following)
+                    print(posts)
+                    print('Email:',list(set(email)))
+                    print ('--------------Scraping completed!-----------------')
+
+                    self.email.append(email)
+                    self.driver.get(url)
+                    time.sleep(2)
+
+                    if i>4:
+                        div = self.driver.find_element_by_xpath(xpath)
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(div).perform()
+        except:
+            print("Error! Check your internet")
+
+        try:
+            for i in range(11,21):
+                for j in range(1,4):
+                    xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
+                    xpath += str(i)
+                    xpath += ']/div['
+                    xpath+=str(j)
+                    xpath+=']'
+                    self.driver.find_element_by_xpath(xpath).click()
+                    pxpath='//span/a[@tabindex="0"]'
+                    self.driver.find_element_by_xpath(pxpath).click()
+                    time.sleep(10)
 
 
-                self.driver.get(self.driver.current_url)
-                html=self.driver.page_source
-                time.sleep(2)
-                #print(html)
+                    self.driver.get(self.driver.current_url)
+                    html=self.driver.page_source
+                    time.sleep(2)
+                    #print(html)
 
-                title1=html.find('<title>')
-                title2=html.find('</title>')
+                    title1=html.find('<title>')
+                    title2=html.find('</title>')
 
-                content1=html.find('<meta content="')
-                content2=html.find('See Instagram')
-                content=html[content1+15:content2-2].split(', ')
+                    content1=html.find('<meta content="')
+                    content2=html.find('See Instagram')
+                    content=html[content1+15:content2-2].split(', ')
 
-                followers=content[0]
-                following=content[1]
-                posts=content[2]
+                    followers=content[0]
+                    following=content[1]
+                    posts=content[2]
 
-                email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
-                print('User:',html[title1+7:title2-29])
-                print(followers)
-                print(following)
-                print(posts)
-                print('Email:',list(set(email)))
-                print ('--------------Scraping completed!-----------------')
+                    email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
+                    print('User:',html[title1+7:title2-29])
+                    print(followers)
+                    print(following)
+                    print(posts)
+                    print('Email:',list(set(email)))
+                    print ('--------------Scraping completed!-----------------')
 
-                self.email.append(email)
-                self.driver.get(url)
-                time.sleep(2)
+                    self.email.append(email)
+                    self.driver.get(url)
+                    time.sleep(2)
 
-                if i>4:
+                    if i>14:
+                        div = self.driver.find_element_by_xpath(xpath)
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(div).perform()
+        except:
+            print("Error! Check your internet")
 
-                    div = self.driver.find_element_by_xpath(xpath)
+        try:
+            for i in range(21,31):
+                for j in range(1,4):
+                    xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
+                    xpath += str(i)
+                    xpath += ']/div['
+                    xpath+=str(j)
+                    xpath+=']'
+                    self.driver.find_element_by_xpath(xpath).click()
+                    pxpath='//span/a[@tabindex="0"]'
+                    self.driver.find_element_by_xpath(pxpath).click()
+                    time.sleep(10)
 
-                    actions = ActionChains(self.driver)
-                    actions.move_to_element(div).perform()
+
+                    self.driver.get(self.driver.current_url)
+                    html=self.driver.page_source
+                    time.sleep(2)
+                    #print(html)
+
+                    title1=html.find('<title>')
+                    title2=html.find('</title>')
+
+                    content1=html.find('<meta content="')
+                    content2=html.find('See Instagram')
+                    content=html[content1+15:content2-2].split(', ')
+
+                    followers=content[0]
+                    following=content[1]
+                    posts=content[2]
+
+                    email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
+                    print('User:',html[title1+7:title2-29])
+                    print(followers)
+                    print(following)
+                    print(posts)
+                    print('Email:',list(set(email)))
+                    print ('--------------Scraping completed!-----------------')
+
+                    self.email.append(email)
+                    self.driver.get(url)
+                    time.sleep(2)
+
+                    if i>24:
+                        div = self.driver.find_element_by_xpath(xpath)
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(div).perform()
+        except:
+            print("Error! Check your internet")
+
+        try:
+            for i in range(31,34):
+                for j in range(1,4):
+                    xpath='//*[@id="react-root"]/section/main/article/div[2]/div/div['
+                    xpath += str(i)
+                    xpath += ']/div['
+                    xpath+=str(j)
+                    xpath+=']'
+                    self.driver.find_element_by_xpath(xpath).click()
+                    pxpath='//span/a[@tabindex="0"]'
+                    self.driver.find_element_by_xpath(pxpath).click()
+                    time.sleep(10)
+
+
+                    self.driver.get(self.driver.current_url)
+                    html=self.driver.page_source
+                    time.sleep(2)
+                    #print(html)
+
+                    title1=html.find('<title>')
+                    title2=html.find('</title>')
+
+                    content1=html.find('<meta content="')
+                    content2=html.find('See Instagram')
+                    content=html[content1+15:content2-2].split(', ')
+
+                    followers=content[0]
+                    following=content[1]
+                    posts=content[2]
+
+                    email = re.findall(r'[\w\.-]+@[\w\.-]+', html)
+                    print('User:',html[title1+7:title2-29])
+                    print(followers)
+                    print(following)
+                    print(posts)
+                    print('Email:',list(set(email)))
+                    print ('--------------Scraping completed!-----------------')
+
+                    self.email.append(email)
+                    self.driver.get(url)
+                    time.sleep(2)
+
+                    if i>24:
+                        div = self.driver.find_element_by_xpath(xpath)
+                        actions = ActionChains(self.driver)
+                        actions.move_to_element(div).perform()
+        except:
+            print("Error! Check your internet")
+
+
+
 
         print("--------------Recent Posters Completed!-----------------")
-        self.generate_csv()
 
-
-
-        
 
     def main(self):
         self.email = []
@@ -186,9 +336,8 @@ class Insta_Info_Scraper:
             hashtag=[hashtag]
         for i in hashtag:
             self.getinfo(i)
+        self.generate_csv()
         
-        
-
 
 # collecting all the mails id into csv file
     def generate_csv(self):
