@@ -301,7 +301,7 @@ def send_connection_request():
     keyword = sys.argv[4]
     location = sys.argv[5]
     message = sys.argv[6]
-    page = sys.argv[7]
+    page = int(sys.argv[7])
     limit = int(sys.argv[8])
     sleeps = [2,3,4]
     print(Email_id)
@@ -322,6 +322,8 @@ def send_connection_request():
     # PATH = r"C:\Users\BILAL\Projects\LinkedInScraper\chromedriver.exe"
     PATH=r"/usr/local/bin/chromedriver"
     driver = webdriver.Chrome(PATH,options=chrome_options)
+    # driver = webdriver.Chrome(options=chrome_options)
+
     
     sleeps = [2,3,4]
     driver.get("https://www.linkedin.com/login")
