@@ -1,3 +1,4 @@
+#Repository : bilal_linkedin_reply
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -15,7 +16,8 @@ import traceback
 
 Email_id = sys.argv[1]
 Password = sys.argv[2]
-input_message = sys.argv[3]
+OldMessage = sys.argv[3]
+input_message = sys.argv[4]
 # print(input_message)
 
 sleeps = [2,3,4]
@@ -115,113 +117,115 @@ print("Chats:", len(chats))
 for enu,chat in enumerate(chats):
     # print(enu, chat)
     print("-------------------")
-    chat = chats[enu].find('mark', attrs={"class":"msg-conversation-card__unread-count"})
-    if chat:
-        try:
-            print("New Message")
-            chat_container[enu].send_keys(Keys.RETURN)
-            time.sleep(random.choice(sleeps))
-            soup = BeautifulSoup(driver.page_source, 'html.parser')
-            # chat_box = soup.find('div', {"class":"msg-overlay-conversation-bubble"})
-            chat_box = soup.find('div', {"class":"msg-s-message-list-container relative display-flex mtA ember-view"})
-            # print("chatbox", len(chat_box))
-            # conversation_list = chat_box.find('ul', {"class":"msg-s-message-list-content  list-style-none full-width"})
-            conversation_list = chat_box.find('ul')
-            time.sleep(random.choice(sleeps))
-            conversation = conversation_list.find_all('li')
-            time.sleep(random.choice(sleeps))
-            # container = chat_box.find('h4')
-            container = soup.find('h4', {'class':"msg-overlay-bubble-header__title truncate t-14 t-bold t-black pr1"})
-            name = container.find('a').text.strip()
-            # print(name)
-            first_name = name.split(' ')[0]
-            last_name = name.split( ' ')[1]
-            if len(conversation) < 4:
-                link = conversation[0].find_all('a')
-                link = link[1]['href']
+    # chat = chats[enu].find('mark', attrs={"class":"msg-conversation-card__unread-count"})
+    # if chat:
+    try:
+        # print("New Message")
+        chat_container[enu].send_keys(Keys.RETURN)
+        time.sleep(random.choice(sleeps))
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        # chat_box = soup.find('div', {"class":"msg-overlay-conversation-bubble"})
+        chat_box = soup.find('div', {"class":"msg-s-message-list-container relative display-flex mtA ember-view"})
+        # print("chatbox", len(chat_box))
+        # conversation_list = chat_box.find('ul', {"class":"msg-s-message-list-content  list-style-none full-width"})
+        conversation_list = chat_box.find('ul')
+        time.sleep(random.choice(sleeps))
+        conversation = conversation_list.find_all('li')
+        time.sleep(random.choice(sleeps))
+        # container = chat_box.find('h4')
+        container = soup.find('h4', {'class':"msg-overlay-bubble-header__title truncate t-14 t-bold t-black pr1"})
+        name = container.find('a').text.strip()
+        # print(name)
+        first_name = name.split(' ')[0]
+        last_name = name.split( ' ')[1]
+        if len(conversation) < 4:
+            link = conversation[0].find_all('a')
+            link = link[1]['href']
 
+            profile_link= "https://www.linkedin.com"+link
+            # print(profile_link)
+        # print("Before for loop")
+        conversation.reverse()
+        for num,messages in enumerate(conversation):
+            # print("ATTEMPT",num)
+            if messages.p is None:
+                # print("NO message")
+                continue
+            if messages.find('a')is None:
+                # print("NO LINK")
+                continue
+            name_ = messages.find_all('a')
+            name1 = name_[1].text.strip()
+            link = messages.find('a')['href']
+            msg = messages.p.text
+            # print("1111")
+            # print("Professional Link",profile_link)
+            if name1 == name:
+                link = messages.find('a')['href']
                 profile_link= "https://www.linkedin.com"+link
-                # print(profile_link)
-            # print("Before for loop")
-            conversation.reverse()
-            for num,messages in enumerate(conversation):
-                # print("ATTEMPT",num)
-                if messages.p is None:
-                    # print("NO message")
-                    continue
-                if messages.find('a')is None:
-                    # print("NO LINK")
-                    continue
-                name_ = messages.find_all('a')
-                name1 = name_[1].text.strip()
+            #     print(profile_link)
+            # print("22222", name1, name)
+            if name1 != name: 
+                # print("3333")
+                my_link = messages.find('a')['href']
                 link = messages.find('a')['href']
                 msg = messages.p.text
-                # print("1111")
-                # print("Professional Link",profile_link)
-                if name1 == name:
-                    link = messages.find('a')['href']
-                    profile_link= "https://www.linkedin.com"+link
-                #     print(profile_link)
-                # print("22222", name1, name)
-                if name1 != name:
-                    # print("3333")
-                    my_link = messages.find('a')['href']
-                    link = messages.find('a')['href']
-                    msg = messages.p.text
-    #                 print(name1)
-    #                 print(my_link)
-                    print(msg)
-                    if msg == 'I have a great job opportunity for you' or msg == 'I have a great job opportunity for you.' or 'I have a great job' in msg:
-                        print("Replying")
+#                 print(name1)
+#                 print(my_link)
+                print(msg)
+                # if msg == 'I have a great job opportunity for you' or msg == 'I have a great job opportunity for you.' or 'I have a great job' in msg:
+                if OldMessage in msg:
+                    print("Replying")
 
-                        # message = f"https://www.soojji.com/profile_edit?linkedinurl={profile_link}&firstname={first_name}&lastname={last_name}"
-                        message = f"https://www.soojji.com/interview_form?linkedinurl={profile_link}&firstname={first_name}&lastname={last_name}"
-                        reply = driver.find_element_by_xpath("//div[@aria-label='Write a message…']")
-                        time.sleep(random.choice(sleeps))
-                        reply.send_keys(input_message)
-                        send_reply = driver.find_element_by_xpath("//button[@type='submit']")
-                        time.sleep(random.choice(sleeps))
-                        send_reply.send_keys(Keys.RETURN)
+                    # message = f"https://www.soojji.com/profile_edit?linkedinurl={profile_link}&firstname={first_name}&lastname={last_name}"
+                    message = f"https://www.soojji.com/interview_form?linkedinurl={profile_link}&firstname={first_name}&lastname={last_name}"
+                    reply = driver.find_element_by_xpath("//div[@aria-label='Write a message…']")
+                    time.sleep(random.choice(sleeps))
+                    reply.send_keys(input_message)
+                    send_reply = driver.find_element_by_xpath("//button[@type='submit']")
+                    time.sleep(random.choice(sleeps))
+                    send_reply.send_keys(Keys.RETURN)
 
-                        reply.send_keys(message)
-                        # send_reply = driver.find_element_by_xpath("//button[@type='submit']")
-                        time.sleep(random.choice(sleeps))
-                        send_reply.send_keys(Keys.RETURN)
+                    reply.send_keys(message)
+                    # send_reply = driver.find_element_by_xpath("//button[@type='submit']")
+                    time.sleep(random.choice(sleeps))
+                    send_reply.send_keys(Keys.RETURN)
 
-                        close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
-                        time.sleep(random.choice(sleeps))
-                        close_chat.send_keys(Keys.RETURN)
-                        print("Replied")
-                        time.sleep(random.choice(sleeps))
-    #                     break
-                    else: 
-    #                     print("ELSE")
-                        close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
-                        time.sleep(random.choice(sleeps))
-                        close_chat.send_keys(Keys.RETURN)
-                        time.sleep(random.choice(sleeps))
-                    break
-                        # print("ELSE")
-            try:
-                close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
-                time.sleep(random.choice(sleeps))
-                if close_chat:
-                    
                     close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
                     time.sleep(random.choice(sleeps))
                     close_chat.send_keys(Keys.RETURN)
-                    time.sleep(random.choice(sleeps)) 
-            except:
-                # print("Error something")
-                # traceback.print_exc()
-                pass
-        except:
+                    print("Replied")
+                    time.sleep(random.choice(sleeps))
+#                     break
+                else: 
+#                     print("ELSE")
+                    close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
+                    time.sleep(random.choice(sleeps))
+                    close_chat.send_keys(Keys.RETURN)
+                    time.sleep(random.choice(sleeps))
+                    print("Different Message... Closing ChatBox...")
+                break
+                    # print("ELSE")
+        try:
             close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
             time.sleep(random.choice(sleeps))
-            if close_chat:                
+            if close_chat:
+                
+                close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
                 time.sleep(random.choice(sleeps))
                 close_chat.send_keys(Keys.RETURN)
-                time.sleep(random.choice(sleeps))
-            print("Something error")
-            traceback.print_exc()     
-    #         break
+                time.sleep(random.choice(sleeps)) 
+        except:
+            # print("Error something")
+            # traceback.print_exc()
+            pass
+    except:
+        close_chat = driver.find_element_by_xpath("//button[@data-control-name='overlay.close_conversation_window']")
+        time.sleep(random.choice(sleeps))
+        if close_chat:                
+            time.sleep(random.choice(sleeps))
+            close_chat.send_keys(Keys.RETURN)
+            time.sleep(random.choice(sleeps))
+        print("Something error")
+        traceback.print_exc()     
+#         break

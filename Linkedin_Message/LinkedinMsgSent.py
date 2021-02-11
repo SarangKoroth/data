@@ -29,7 +29,7 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 driver = webdriver.Chrome(r'/usr/local/bin/chromedriver', options=chrome_options)
-#driver = webdriver.Chrome(options=chrome_options)
+# driver = webdriver.Chrome(options=chrome_options)
 
 #Taking Input
 # EmailId = 'donnybegins@gmail.com'
@@ -419,7 +419,8 @@ def LinkedInMsg():
                         link = link.replace(oldPage, newPage)
                         # link = "https://www.linkedin.com/sales/search/people?doFetchHeroCard=false&geoIncluded=102713980&keywords=python&logHistory=false&page="+ str(page)+ "&preserveScrollPosition=false&relationship=S%2CO&rsLogId=770008140&searchSessionId=jh8CsJ15Sl2Qx4QQTraN7g%3D%3D"
                         driver.get(link)
-                        sleep(7)
+                        print("Current Url:", driver.current_url)
+                        sleep(10)
                         ol = driver.find_element_by_xpath("//*[@class='search-results__result-list']")
                         sleep(2)
                         print("Page : " , Page)
@@ -567,3 +568,6 @@ LinkedInMsg()
 '''
 Input: python LinkedinMsgSent.py email@gmail.com password "Message" 2
 '''
+
+# https://www.linkedin.com/checkpoint/challenge/AgGrJolrBPVKtgAAAXeQf7tXlFaBzteqDAbEmo8R_1hlqWKnry-ZLO8DXe73FQwEvm8J_podrDxpa8g_ywNhIoa_szclag?ut=0G8AsWEtNKdVE1
+# https://www.linkedin.com/checkpoint/challenge/AgGxq1ID2HDZTAAAAXeP_SI_2HfbenkSdl7BNm4cv5lMuWUGFsQ_4j2QjOY5lgbZpomTKNyNlq3BYK7CnB1eR3KznCA4TA?ut=1SfZ_c_tnvdFE1
