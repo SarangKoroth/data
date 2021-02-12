@@ -60,6 +60,7 @@ def chat_scroll():
             driver.execute_script("arguments[0].scrollIntoView();", l)
             time.sleep(1)
             # chat_check = chat_list.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
+            chat_check = driver.find_elements_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
             # print(len(chat_check))
         if len(chat_check) > chat_len:
             chat_scroll()

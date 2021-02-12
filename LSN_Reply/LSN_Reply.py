@@ -1,3 +1,4 @@
+#Repository: 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -27,9 +28,11 @@ EmailId = sys.argv[1]
 
 Password = sys.argv[2]
 
-ReplyMsg = sys.argv[3]
+LastMsg = sys.argv[3]
 
-Limit = int(sys.argv[4])
+ReplyMsg = sys.argv[4]
+
+Limit = int(sys.argv[5])
 
 #DB connection
 client = pymongo.MongoClient('mongodb+srv://sumi:'+urllib.parse.quote_plus('sumi@123')+'@codemarket-staging.k16z7.mongodb.net/codemarket_shiraz?retryWrites=true&w=majority')
@@ -80,6 +83,23 @@ def otp():
         LSN_Reply()
     print("No return...")
 
+def chat_scroll():
+    try:
+        ul = driver.find_element_by_xpath("//*[@class='infinite-scroller is-scrollable ember-view overflow-y-auto overflow-hidden flex-grow-1']/ul")
+        chat_len = len(ul.find_elements_by_xpath('./li'))
+        for l in ul.find_elements_by_xpath('./li')  :
+            driver.execute_script("arguments[0].scrollIntoView();", l)
+            time.sleep(1)
+            # chat_check = chat_list.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
+            ul2 = driver.find_element_by_xpath("//*[@class='infinite-scroller is-scrollable ember-view overflow-y-auto overflow-hidden flex-grow-1']/ul")
+            # print(len(chat_check))
+        print(len(ul2.find_elements_by_xpath('./li')), chat_len)
+        if len(ul2.find_elements_by_xpath('./li')) > chat_len:
+            chat_scroll()
+        print("Scrolling chat...")
+    except:
+        print("No chat scroll...")
+
 
 def LSN_Reply():
     
@@ -120,9 +140,13 @@ def LSN_Reply():
         
         sleep(20) #Longer wait for page load
 
+        chat_scroll()
+
         #Connection list 
         ul = driver.find_element_by_xpath("//*[@class='infinite-scroller is-scrollable ember-view overflow-y-auto overflow-hidden flex-grow-1']/ul")
         count = 1
+
+        flag = 0
 
         #Going through each connection
         for x in ul.find_elements_by_xpath("./li"):
@@ -136,10 +160,10 @@ def LSN_Reply():
 
             #Chat Inbox
             inbox = driver.find_element_by_xpath("//*[@class='flex flex-column flex-grow-1 flex-shrink-zero justify-flex-end ember-view']/ul")
-            print(len(inbox.find_elements_by_xpath("./li")))
+            # print(len(inbox.find_elements_by_xpath("./li")))
 
             #Going through each chat message
-            for i in inbox.find_elements_by_xpath("./li"):
+            for i in reversed(inbox.find_elements_by_xpath("./li")):
                 #print(i.text)
                 try:
                     #Checking for inmail message - if found then break the loop and moving to next connection - else Normal message
@@ -161,24 +185,101 @@ def LSN_Reply():
                     sleep(2)
                     article = i.find_element_by_tag_name("article")
                     sleep(2)
-                    msg = article.find_element_by_xpath("./div[2]")
 
-                    #Checking msg is "I have a great job offer for you" or not
-                    if "I have a great job offer for you" in msg.text:
-                        print("--Invitation Message Found--")
+                    yourMsgName = article.find_element_by_xpath("./div[1]").text.strip()
+                    yourMsgName = yourMsgName.split(" ")[0]
 
-                        #If Msg found enter Reply msg
-                        textArea = driver.find_element_by_xpath("//*[@class='flex-grow-1 overflow-y-auto']")
-                        textArea = textArea.find_element_by_tag_name("textarea")
-                        textArea.click()
-                        sleep(2)
-                        textArea.send_keys(ReplyMsg)
-                        
-                        #Click on send
-                        sleep(2)
-                        send = driver.find_element_by_xpath("//button[@class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view ml4']")
-                        send.click()
-                        print("--Reply Message sent successfully--")
+                    #Finding your sent messsage if you sent some message then it will compare LastMsg(input) with msg.text(already sent msg )
+                    if yourMsgName == "You":
+
+                        msg = article.find_element_by_xpath("./div[2]")
+                        # print(msg.text)
+                        #Checking msg is equal to LastMsg or not 
+                        # if "I have a great job offer for you" in msg.text:
+                        if LastMsg in msg.text:
+                            print("--Invitation Message Found--")
+
+                            #Name retrieve
+                            name = x.find_element_by_xpath('./a/div/div[2]/div/div[1]')
+                            #print(name.text)
+                            
+                            name = name.text.strip()
+                            
+                            first_name = name.split(' ')[0]
+                            last_name = name.split( ' ')[1]
+                            
+                            #Save the window opener (current window)
+                            main_window = driver.current_window_handle
+
+                            profile = driver.find_element_by_xpath("//*[@data-control-name='view_profile']")
+                            profile.click()
+
+                            # Switch tab to the new tab, which we will assume is the next one on the right
+                            driver.switch_to.window(driver.window_handles[1])
+                            sleep(4)
+
+                            #view profile dots 
+                            viewProfileDots = driver.find_element_by_xpath("(//*[@class='profile-topcard-actions flex align-items-center mt2']/div)[last()]")
+                            viewProfileDots.click()
+                            sleep(2)
+
+                            #view profile list options
+                            viewProfileConnect = viewProfileDots.find_element_by_xpath("div/div/div/div/ul")
+                            for x in viewProfileConnect.find_elements_by_xpath("./li"):
+                                try:
+                                    # print(x.text)
+                                    #For connect
+                                    if x.text == "View on LinkedIn.com":
+                                        print("Clicking on view on linkedin.com")
+                                        x.click()
+                                        driver.close()
+                                        driver.switch_to.window(driver.window_handles[1])
+                                        sleep(4)
+                                        profile_link = driver.current_url
+                                        #Close the new tab
+                                        driver.close()
+                                        sleep(2)
+                                        #Switch back to old tab
+                                        driver.switch_to.window(main_window)
+                                        break
+                                except:
+                                    pass
+                                    # driver.close()
+                                    # driver.switch_to.window(main_window)
+
+                            #If Msg found enter Reply msg
+                            textArea = driver.find_element_by_xpath("//*[@class='flex-grow-1 overflow-y-auto']")
+                            textArea = textArea.find_element_by_tag_name("textarea")
+                            textArea.click()
+                            sleep(2)
+                            textArea.send_keys(ReplyMsg)
+                            
+                            #Click on send
+                            sleep(2)
+                            send = driver.find_element_by_xpath("//button[@class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view ml4']")
+                            send.click()
+
+                            if first_name and last_name and profile_link:
+                                message = f"https://www.soojji.com/interview_form?linkedinurl={profile_link}&firstname={first_name}&lastname={last_name}"
+                                textArea.click()
+                                sleep(2)
+                                textArea.send_keys(message)
+                                
+                                #Click on send
+                                sleep(2)
+                                send = driver.find_element_by_xpath("//button[@class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view ml4']")
+                                send.click()
+
+                            print("--Reply Message sent successfully--")
+                            
+                            print("Count : ", count)
+                            if count < Limit:
+                                count += 1
+                            else:
+                                flag = 1
+                                print("Limit is reached...")
+                                break
+                            break
                         break
                 except:
                     #For ignoring 1 element of ul - li
@@ -186,11 +287,9 @@ def LSN_Reply():
                     print("--Invitation message is searching.--")
                     #traceback.print_exc()
             #break
-            print("Count : ", count)
-            if count < Limit:
-                count += 1
-            else:
-                print("Limit is reached... Reply Message is stopped")
+            if flag == 1:
+                print("Flag : ", flag)
+                print("--Reply Message Stopped--")
                 break
             
     except:
@@ -198,41 +297,3 @@ def LSN_Reply():
         traceback.print_exc()
 
 LSN_Reply()
-
-'''
-Output:
-Input$ python LSN_Reply.py sumi@codemarket.io Codemarket.123 "We have multiple job openings in MERN stack, Python, ML/AI, Designer UI-UX, and IOS/Android mobile App Development. The following questions help to match the opportunity  1. What is the timeline for when you would like to join?  2. What is your current salary/stipend?  3. What is your expected salary/stipend?  4. Send your resume here on LinkedIn chat  5. What is your skill set?  6. what is your whatsapp?  To move forward please answer the above questions. Interview takes place on WhatsApp." 7
-
-
-Current Url : https://www.linkedin.com/feed/
-Login...
-Redirected to Linkedin Sales Navigator Inbox Page.
-2
---Invitation message is searching.--
---Invitation Message Found--
---Reply Message sent successfully--
-Count :  1
-6
---Invitation message is searching.--
-Count :  2
-2
---Invitation message is searching.--
---Invitation Message Found--
---Reply Message sent successfully--
-Count :  3
-2
---Not Connected--
-Count :  4
-2
---Not Connected--
-Count :  5
-3
---Invitation message is searching.--
-Count :  6
-4
---Invitation message is searching.--
---Invitation Message Found--
---Reply Message sent successfully--
-Count :  7
-Limit is reached... Reply Message is stopped
-'''
