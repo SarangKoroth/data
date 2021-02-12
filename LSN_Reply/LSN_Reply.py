@@ -90,9 +90,7 @@ def chat_scroll():
         for l in ul.find_elements_by_xpath('./li')  :
             driver.execute_script("arguments[0].scrollIntoView();", l)
             time.sleep(1)
-            # chat_check = chat_list.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
             ul2 = driver.find_element_by_xpath("//*[@class='infinite-scroller is-scrollable ember-view overflow-y-auto overflow-hidden flex-grow-1']/ul")
-            # print(len(chat_check))
         print(len(ul2.find_elements_by_xpath('./li')), chat_len)
         if len(ul2.find_elements_by_xpath('./li')) > chat_len:
             chat_scroll()
