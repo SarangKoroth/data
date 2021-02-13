@@ -66,6 +66,8 @@ print(Page, type(Page))
 
 Limit = int(sys.argv[9])
 
+PastLeadAccountActivity = "Remove Saved Leads from search"
+
 #print(EmailId, " ", Password, " ", KeyWord, " ", Geography, " ", Relationship, " ",  MessageSend, " ", url, " ", Limit)
 
 #DB connection
@@ -187,6 +189,18 @@ def LinkedInMsg():
             for x in range(1,len(ul.find_elements_by_xpath("./li"))-1):
                 divLi = driver.find_element_by_xpath("//*[@class='search-filter__list collapsible-container is-expanded ember-view']/li[" + str(x+1) + "]/div/div/div/div/div")
                 #print(divLi.text)
+
+                #For 
+                if divLi.text == "Past Lead and Account Activity":
+                    buttonLi = driver.find_element_by_xpath("//*[@class='search-filter__list collapsible-container is-expanded ember-view']/li[" + str(x+1) + "]/div/div/div/div/button")
+                    buttonLi.click()
+                    sleep(2) 
+                    inputOl = driver.find_element_by_xpath("//*[@class='search-filter-typeahead__list overflow-y-auto']")
+                    for li in inputOl.find_elements_by_xpath('./li'):
+                        if li.text == PastLeadAccountActivity:
+                            li.click()
+                            print("--Past Lead and Account Activity Selected--")
+                            break
 
                 #For Geaography
                 if divLi.text == "Geography":
@@ -406,7 +420,7 @@ def LinkedInMsg():
                             print("-- Unsuccessfull, Invitation Can't send --")
                             # traceback.print_exc()
 
-                        print("checkConnectionCount : ", checkConnectionCount)
+                        # print("checkConnectionCount : ", checkConnectionCount)
                         if flag == 1:
                             break
                         else:
