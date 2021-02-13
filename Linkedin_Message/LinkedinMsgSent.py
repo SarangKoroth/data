@@ -190,7 +190,7 @@ def LinkedInMsg():
                 divLi = driver.find_element_by_xpath("//*[@class='search-filter__list collapsible-container is-expanded ember-view']/li[" + str(x+1) + "]/div/div/div/div/div")
                 #print(divLi.text)
 
-                #For 
+                #For PastLeadAccountActivity
                 if divLi.text == "Past Lead and Account Activity":
                     buttonLi = driver.find_element_by_xpath("//*[@class='search-filter__list collapsible-container is-expanded ember-view']/li[" + str(x+1) + "]/div/div/div/div/button")
                     buttonLi.click()
