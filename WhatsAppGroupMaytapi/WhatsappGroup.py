@@ -10,7 +10,7 @@ print("--Script Started--")
 client = pymongo.MongoClient('mongodb+srv://sumi:'+urllib.parse.quote_plus('sumi@123')+'@codemarket-staging.k16z7.mongodb.net/dreamjobpal?retryWrites=true&w=majority')
 db = client.dreamjobpal
 collection = db.interviewforms
-whatsappData = list(collection.find({"status": "Whatsapp group not created"}))
+whatsappData = list(collection.find({"status": "Form Submitted"}))
 print(len(whatsappData))
 if len(whatsappData):
     # print('iff')
