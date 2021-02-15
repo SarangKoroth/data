@@ -12,6 +12,7 @@ from mongoengine import *
 from mongoengine.context_managers import switch_collection
 import random
 import sys
+import traceback
 
 
 
@@ -300,9 +301,11 @@ def send_connection_request():
     Password = sys.argv[3]
     keyword = sys.argv[4]
     location = sys.argv[5]
-    message = sys.argv[6]
-    page = int(sys.argv[7])
-    limit = int(sys.argv[8])
+    relationship = sys.argv[6]
+    relationship = relationship.split()
+    message = sys.argv[7]
+    page = int(sys.argv[8])
+    limit = int(sys.argv[9])
     sleeps = [2,3,4]
     print(Email_id)
     print(Password)
@@ -315,6 +318,8 @@ def send_connection_request():
     my_db = client['dreamjobpal']
     db = my_db.linkedinContacts
     chrome_options = Options()
+    chrome_options.add_argument(" — incognito")
+    chrome_options.add_argument("--window-size=1920,1200");
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-gpu")
@@ -339,6 +344,7 @@ def send_connection_request():
     
     my_db.linkedin_otp.drop()
 
+    #Keyword
     time.sleep(4)
     chatWindow()
     search = driver.find_element_by_class_name("search-global-typeahead__input ")
@@ -347,9 +353,13 @@ def send_connection_request():
     print("Entered keyword")
     time.sleep(10)
     
+    #People
     people = driver.find_element_by_xpath("//button[@aria-label='People']")
     people.click()
     time.sleep(random.choice(sleeps))
+    print("--People selected--")
+
+    #Location
     #selecting location(India)
     time.sleep(5)
     container = driver.find_element_by_xpath("//button[@aria-label='Locations filter. Clicking this button displays all Locations filter options.']")
@@ -365,10 +375,30 @@ def send_connection_request():
     print(find_location)
     select_location = find_location.find_element_by_xpath("//div[@role='option']")
     select_location.click()
-
     select_location = driver.find_elements_by_xpath("//div[@class='artdeco-hoverable-content__shell']//button[@aria-label='Apply selected filter and show results']")
     select_location[1].click()
     time.sleep(random.choice(sleeps))
+    print("--Location selected--")
+
+    #Reationshio 
+    # relationship = ['2', '3']
+    connection = driver.find_element_by_xpath("//button[@aria-label='Connections filter. Clicking this button displays all Connections filter options.']")
+    connection.click()
+    ConnectionsAll = driver.find_element_by_xpath("//div[@id='hoverable-outlet-connections-filter-value']")
+    ul = ConnectionsAll.find_element_by_tag_name('ul')
+    # print(len(ul.find_elements_by_xpath('./li')))
+    for r in relationship:
+        for x in ul.find_elements_by_xpath('./li'):
+            span = x.find_element_by_tag_name('span')
+            if r in span.text:
+    #             print(span.text)
+                span.click()
+                print("--Relationship selected--")
+    button = driver.find_element_by_xpath("//div[@id='hoverable-outlet-connections-filter-value']//button[@aria-label='Apply selected filter and show results']")
+    button.click()
+    print("--Show result--")
+
+    #Pagination
     url = driver.current_url
     pagination = url
     print(pagination)
@@ -396,48 +426,68 @@ def send_connection_request():
                 chatWindow()
                 if count <= limit:
                     try:
-                        #Click on onnect button
-                        connect = result.find_element_by_xpath("//button[@class='artdeco-button artdeco-button--2 artdeco-button--secondary ember-view']")
-                        print("Clicking on Connect")
-                        time.sleep(5)
+                        # print(enu)
+                        #Click on connect button
+                        if "Connect" in result.text:
+                            connectDiv = result.find_element_by_xpath("//div[@class='entity-result__actions entity-result__divider']")
+                            connect = connectDiv.find_element_by_xpath("//button[@class='artdeco-button artdeco-button--2 artdeco-button--secondary ember-view']//span[@class='artdeco-button__text']")
+                            # print(connect.text)
+                            print("Clicking on Connect")
+                            time.sleep(5)
 
-                        connect.click()
-                        #ActionChains(driver).click(connect).perform()
-                        time.sleep(random.choice(sleeps))
-                        print("Sending request...")
+                            connect.click()
+                            #ActionChains(driver).click(connect).perform()
+                            time.sleep(random.choice(sleeps))
+                            print("Sending request...")
 
-                        #adding Note
-                        add_note = driver.find_element_by_xpath("//button[@aria-label='Add a note']")
-                        add_note.click()
-                        time.sleep(random.choice(sleeps))
-                        add_note = driver.find_element_by_xpath("//textarea[@name='message']")
-                        add_note.send_keys(message)
-                        time.sleep(random.choice(sleeps))
+                            #adding Note
+                            add_note = driver.find_element_by_xpath("//button[@aria-label='Add a note']")
+                            add_note.click()
+                            time.sleep(random.choice(sleeps))
+                            add_note = driver.find_element_by_xpath("//textarea[@name='message']")
+                            add_note.send_keys(message)
+                            time.sleep(random.choice(sleeps))
 
-                        #sending note
-                        send_req = driver.find_element_by_xpath("//button[@aria-label='Send now']")
-                        send_req.click()
-                        print("Request Sent")
-                        time.sleep(random.choice(sleeps))
-                        count +=1 
-                        time.sleep(random.choice(sleeps))
-                        profile_link = profiles[enu].find('a')['href']
-                        driver.get(profile_link)
-                        link = f"{driver.current_url}detail/contact-info"
-#                         link
-                        name, linkedin_url, email, phone, sites, ims, extra_links = get_contact_info()
-                        time.sleep(random.choice(sleeps))
+                            #sending note
+                            send_req = driver.find_element_by_xpath("//button[@aria-label='Send now']")
+                            send_req.click()
+                            print("Request Sent")
+                            time.sleep(random.choice(sleeps))
+                            count +=1 
+                            time.sleep(random.choice(sleeps))
+                            profile_link = profiles[enu].find('a')['href']
+                            print(profile_link)
 
-                        experience = get_experience_info()
-                        time.sleep(random.choice(sleeps))
+                            #Save the window opener (current window)
+                            main_window = driver.current_window_handle
 
-                        schools = get_education_info()
-                        time.sleep(random.choice(sleeps))
-                        data.append({"Name": name, "Experience": experience, "Education": schools, "LinkedIn_URL": linkedin_url, "Websites": sites, "Phone": phone, "Email": email, "Instant_Messenger": ims, "Links": extra_links, "Invitation_Status": "Pending" })
-                        driver.get(pagination)
+                            #Open new window
+                            driver.execute_script("window.open('');")
+
+                            # Switch tab to the new tab, which we will assume is the next one on the right
+                            driver.switch_to.window(driver.window_handles[1])
+                            time.sleep(random.choice(sleeps))
+
+                            driver.get(profile_link)
+                            link = f"{driver.current_url}detail/contact-info"
+            #                         link
+                            name, linkedin_url, email, phone, sites, ims, extra_links = get_contact_info()
+                            time.sleep(random.choice(sleeps))
+
+                            experience = get_experience_info()
+                            time.sleep(random.choice(sleeps))
+
+                            schools = get_education_info()
+                            time.sleep(random.choice(sleeps))
+                            data.append({"Name": name, "Experience": experience, "Education": schools, "LinkedIn_URL": linkedin_url, "Websites": sites, "Phone": phone, "Email": email, "Instant_Messenger": ims, "Links": extra_links, "Invitation_Status": "Pending" })
+            #                 driver.get(pagination)
+                            driver.close()
+                            driver.switch_to.window(main_window)
+                        else:
+                            print("--Pending Invitation or Message Button--")
                     except:
                         print("Connection request not sent this user")
-    #                     traceback.print_exc()
+                        traceback.print_exc()
                 else:
                     break
                 driver.execute_script("window.scrollTo(0, " + str(i) + ")")
