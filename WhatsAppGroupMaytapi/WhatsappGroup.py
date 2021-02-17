@@ -28,15 +28,8 @@ if len(whatsappData):
             participant = [y['whatsapp'].replace('+', ''), '18059055170', AdminNumber]
             
             message = f"FirstName : {y['firstname']}\nLastname : {y['lastname']}\nLinkedinUrl : {y['linkedinurl']}\nJoining Timeline : {y['joining_timeline']}\nCurrent_salary : {y['current_salary']}\nExpected_salary : {y['expected_salary']}\nSkill set : {y['skill_set']}\nWhatsapp No : {y['whatsapp']}"
-            
-            # numbers = []
-            # print(y['AdminNumber'], y['MemberNumber'], y['GroupName'], y['Message'])
-            
-            # Getting members numbers in list numbers
-            # for z in y['MemberNumber']:
-            #     numbers.append(z['Number'])
 
-            url1 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10204/createGroup'
+            url1 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10236/createGroup'
             headers = {'x-maytapi-key': 'fc6434c6-fc38-4eaa-87f1-b928f2ecdc84','Content-Type':'application/json','accept':'application/json'}
             
             #adminNo = input("Please enter the group admin's number (country code at front, Ex: 91xxxxxxxxxx):\n")
@@ -82,7 +75,7 @@ if len(whatsappData):
                 message = message + f"\nNot added in group, sent private group invitation to {y['whatsapp']}"
             
 
-            url2 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10204/sendMessage'
+            url2 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10236/sendMessage'
             headers = {'x-maytapi-key': 'fc6434c6-fc38-4eaa-87f1-b928f2ecdc84','Content-Type':'application/json','accept':'application/json'}
 
             #message = input('Please enter the message you want to send on the group:\n')
@@ -91,15 +84,15 @@ if len(whatsappData):
             dataDict = {"to_number": groupId,"type": "text","message": message}
             sendMsg = requests.post(url2, headers = headers, data = json.dumps(dataDict))
             sendMsgJson = sendMsg.json()
-            # print(sendMsgJson)
+            print(sendMsgJson)
 
-            url3 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10204/group/promote'
-            headers = {'x-maytapi-key': 'fc6434c6-fc38-4eaa-87f1-b928f2ecdc84','Content-Type':'application/json','accept':'application/json'}
-            adminNo = adminNo + '@c.us'
-            data_Dict = {"conversation_id": groupId,"number": adminNo}
-            #print(json.dumps(dataDict))
-            promoteMember = requests.post(url3, headers = headers, data = json.dumps(data_Dict))
-            promoteMemberJson = promoteMember.json()
+            # url3 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10236/group/promote'
+            # headers = {'x-maytapi-key': 'fc6434c6-fc38-4eaa-87f1-b928f2ecdc84','Content-Type':'application/json','accept':'application/json'}
+            # adminNo = adminNo + '@c.us'
+            # data_Dict = {"conversation_id": groupId,"number": adminNo}
+            # #print(json.dumps(dataDict))
+            # promoteMember = requests.post(url3, headers = headers, data = json.dumps(data_Dict))
+            # promoteMemberJson = promoteMember.json()
             #print(promoteMemberJson)
             
             print("----1 group created----")
@@ -114,6 +107,7 @@ if len(whatsappData):
                 print("Whatsapp group created, Sent private group invitation")
             else:
                 collection.update_one({"_id":y['_id']}, {'$set':{"status": "Whatsapp group created"}}) #Update
+            sleep(2)
             # break
         except:
             print("Wrong no in database or Country code in number not found or Mobile is not connected in maytapi")

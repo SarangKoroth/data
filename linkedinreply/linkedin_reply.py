@@ -13,11 +13,15 @@ import dns
 from mongoengine import *
 from mongoengine.context_managers import switch_collection
 import traceback
+from selenium.common.exceptions import TimeoutException
+from time import sleep
+
 
 Email_id = sys.argv[1]
 Password = sys.argv[2]
 OldMessage = sys.argv[3]
 input_message = sys.argv[4]
+dateLimit = sys.argv[5] #dateFormat = 2020-12-15
 # print(input_message)
 
 sleeps = [2,3,4]
@@ -51,48 +55,119 @@ def otp():
     submit_otp.send_keys(Keys.RETURN)
     my_db.linkedin_otp.drop()
         
+# def chat_scroll():
+#     try:
+#         chats = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
+#         # chats = driver.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
+#         chat_len = len(chats.find_elements_by_xpath('./div'))
+#         l = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']/div[last()]") #last Element
+#         # for l in chats.find_elements_by_xpath('./div')  :
+#         # print(l)
+#         driver.execute_script("arguments[0].scrollIntoView();", l)
+#         sleep(4)
+#         #time.sleep(1)
+#         # chat_check = chat_list.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
+#         chat_check = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
+#         # print(len(chat_check))
+#         print(len(chat_check.find_elements_by_xpath('./div') ), chat_len)
+#         if len(chat_check.find_elements_by_xpath('./div') ) > chat_len:
+#             chat_scroll()
+#         print("Scrolling chat...")
+#         return True
+#     except:
+#         print("No chat scroll...")
+
 def chat_scroll():
     try:
+        #Chat scrolling
         chats = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
-        # chats = driver.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
         chat_len = len(chats.find_elements_by_xpath('./div'))
-        for l in chats.find_elements_by_xpath('./div')  :
-            driver.execute_script("arguments[0].scrollIntoView();", l)
-            time.sleep(1)
-            # chat_check = chat_list.find_elements_by_xpath("//div[@class='msg-conversation-listitem__link msg-overlay-list-bubble__convo-item   msg-overlay-list-bubble__convo-item--v3']")
-            chat_check = driver.find_elements_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
-            # print(len(chat_check))
-        if len(chat_check) > chat_len:
+        l = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']/div[last()]")
+        driver.execute_script("arguments[0].scrollIntoView();", l)
+        
+        #Incoming Entered Date and converting into ( 202-02-12 to Feb 12, 2020 format)
+        sleep(4)
+        print(dateLimit)
+        incomingdate = dateLimit
+        incomingdate = incomingdate.split('-')
+        if int(incomingdate[1]) < 10:
+            incomingdate[1] = incomingdate[1].replace('0','')
+        month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        monthCheck = month[int(incomingdate[1])-1]
+        sleep(2)
+        
+        #Retreiving date
+        timetext = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']/div[last()]/div/div[2]/div/div[1]/time")
+        timetext = timetext.text.split()
+        timeDate = timetext[1].replace(',', '')
+        flag = 0
+        print("Enterd date :", incomingdate)
+        print("Retrive date :",timetext)
+        
+        #Comparing both date
+        if int(incomingdate[0]) < 2021: #for Dec 12, 2020
+            try:
+                if int(timetext[2]) == int(incomingdate[0]):
+                    if timetext[0] == monthCheck:
+                        if int(timeDate) <= int(incomingdate[2]):
+                            flag = 1
+                            print("Found Date. Stop Scrolling")
+            except:
+                pass
+        else: #for Feb 15 (2021 year)
+            if timetext[0] == monthCheck:
+                if int(timeDate) <= int(incomingdate[2]):
+                    flag = 1
+                    print("Found Date. Stop Scrolling")
+                    
+        sleep(2)
+        
+        #Retreiving latest chatlist
+        chat_check = driver.find_element_by_xpath("//*[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
+        print(len(chat_check.find_elements_by_xpath('./div') ), chat_len)
+        
+        #flag is updated to 1 means entered date found. if its 0 means it will find next date and call fundtion again
+        if len(chat_check.find_elements_by_xpath('./div') ) > chat_len and flag == 0:
             chat_scroll()
         print("Scrolling chat...")
         return True
     except:
         print("No chat scroll...")
+        # traceback.print_exc()
 
+try: 
+    chrome_options = Options()
+    chrome_options.add_argument(" — incognito")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    PATH= r"/usr/local/bin/chromedriver"
+    # PATH = r"C:\Users\BILAL\Projects\LinkedInScraper\chromedriver.exe"
+    driver = webdriver.Chrome(PATH,options=chrome_options)
+    # driver = webdriver.Chrome(options=chrome_options)
 
+    driver.get("https://www.linkedin.com/login")
 
-chrome_options = Options()
-chrome_options.add_argument(" — incognito")
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument('--disable-dev-shm-usage')
+except TimeoutException as exception:
+    print("Chrome failed to start... Please Restart Script...")
 
-PATH= r"/usr/local/bin/chromedriver"
-# PATH = r"C:\Users\BILAL\Projects\LinkedInScraper\chromedriver.exe"
-driver = webdriver.Chrome(PATH,options=chrome_options)
-# driver = webdriver.Chrome(options=chrome_options)
-
-
-driver.get("https://www.linkedin.com/login")
 driver.find_element_by_id("username").send_keys(Email_id)
 password = driver.find_element_by_id("password")
 time.sleep(random.choice(sleeps))
 password.send_keys(Password)
 password.send_keys(Keys.RETURN)
 
-if 'https://www.linkedin.com/checkpoint' in driver.current_url:
+if driver.current_url == 'https://www.linkedin.com/checkpoint/lg/login-submit' or "login-submit" in driver.current_url:
+    print("--Incorrect login details--")
+
+elif 'https://www.linkedin.com/checkpoint/lg/login?errorKey=challenge_global_internal_error' in driver.current_url:
+    print("Sorry something went wrong. Please try again later")
+
+elif 'https://www.linkedin.com/checkpoint' in driver.current_url:
+    print("Current URL : ", driver.current_url)
     otp()
+print("Current URL : ", driver.current_url)
 print('Login...')
     
 # chat_list = driver.find_element_by_xpath("//div[@class='msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list']")
@@ -109,10 +184,20 @@ chat_container = chat_check
 soup1 = BeautifulSoup(driver.page_source, 'html.parser')
 # print(soup1)
 
-chats = soup1.find_all('div', attrs={"class": "msg-conversation-listitem__link msg-overlay-list-bubble__convo-item msg-overlay-list-bubble__convo-item--v2"})
+# chatDIv = soup1.find_all('div', attrs={"class": "msg-conversations-container__conversations-list msg-overlay-list-bubble__conversations-list"})
+# chats = chatDIv[0].find_all('div', attrs={"class": "msg-conversation-listitem__link msg-overlay-list-bubble__convo-item msg-overlay-list-bubble__convo-item--v2 "})
+sleep(2)
+chats = soup1.find_all('div', attrs={"class": "msg-conversation-listitem__link msg-overlay-list-bubble__convo-item msg-overlay-list-bubble__convo-item--v2 "})
 if len(chats) == 0: 
     # print("Iff")
     chats = soup1.find_all('div', attrs={"class": "msg-conversation-listitem__link msg-overlay-list-bubble__convo-item"})
+if len(chats) == 0: 
+    print("Iff")
+    chats = soup1.find_all('div', attrs={"class": "msg-conversation-listitem__link msg-overlay-list-bubble__convo-item msg-overlay-list-bubble__convo-item--v2"})
+if len(chats) == 0: 
+    print("Iff")
+    chats = soup1.find_all('div', attrs={"class": "msg-conversation-listitem__link msg-overlay-list-bubble__convo-item  msg-overlay-list-bubble__convo-item--v2"})
+
 
 print("Chats:", len(chats))
 for enu,chat in enumerate(chats):
