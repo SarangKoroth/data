@@ -26,11 +26,11 @@ dateLimit = sys.argv[5] #dateFormat = 2020-12-15
 
 sleeps = [2,3,4]
 def otp():
-    client = pymongo.MongoClient('mongodb+srv://bilalm:' + urllib.parse.quote_plus('Codemarket.123') + '@codemarket-staging.k16z7.mongodb.net/dreamjobpal?retryWrites=true&w=majority')
-    my_db = client['dreamjobpal']
+    client = pymongo.MongoClient('mongodb+srv://bilalm:' + urllib.parse.quote_plus('Codemarket.123') + '@codemarket-staging.k16z7.mongodb.net/codemarket_shiraz?retryWrites=true&w=majority')
+    my_db = client['codemarket_shiraz']
     time.sleep(random.choice(sleeps))
     print("Linkedin sent you an OTP to your email.")
-    otp_db = my_db.linkedin_otp
+    otp_db = my_db.OTP_linkedin
     otp_db.insert({"linkedin_login_url": Email_id, "Status":"OTP sent"})
 # execute "python otp.py <email> <otp>" in another terminal
     flag = True
@@ -53,7 +53,7 @@ def otp():
     submit_otp = driver.find_element_by_name("pin")
     submit_otp.send_keys(otp)
     submit_otp.send_keys(Keys.RETURN)
-    my_db.linkedin_otp.drop()
+    my_db.OTP_linkedin.drop()
         
 # def chat_scroll():
 #     try:
@@ -161,10 +161,10 @@ password.send_keys(Keys.RETURN)
 if driver.current_url == 'https://www.linkedin.com/checkpoint/lg/login-submit' or "login-submit" in driver.current_url:
     print("--Incorrect login details--")
 
-elif 'https://www.linkedin.com/checkpoint/lg/login?errorKey=challenge_global_internal_error' in driver.current_url:
+if 'https://www.linkedin.com/checkpoint/lg/login?errorKey=challenge_global_internal_error' in driver.current_url:
     print("Sorry something went wrong. Please try again later")
 
-elif 'https://www.linkedin.com/checkpoint' in driver.current_url:
+if 'https://www.linkedin.com/checkpoint' in driver.current_url:
     print("Current URL : ", driver.current_url)
     otp()
 print("Current URL : ", driver.current_url)
