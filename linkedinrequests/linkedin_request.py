@@ -418,7 +418,8 @@ def send_connection_request():
         i = 125
         result_list = driver.find_elements_by_xpath("//li[@class='reusable-search__result-container ']")
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-        container = soup.find("div", attrs={"role": "main"})
+        # container = soup.find("div", attrs={"role": "main"})
+        container = soup.find("main", attrs={"role": "main"})
         profiles = container.find_all("li")    
 
         for enu,result in enumerate(result_list):

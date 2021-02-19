@@ -5,6 +5,9 @@ from time import sleep
 import pymongo
 from bson.objectid import ObjectId
 import pandas as pd
+import sys
+
+messageSend = sys.argv[1]
 
 print("--Script Started--")
 client = pymongo.MongoClient('mongodb+srv://sumi:'+urllib.parse.quote_plus('sumi@123')+'@codemarket-staging.k16z7.mongodb.net/dreamjobpal?retryWrites=true&w=majority')
@@ -80,20 +83,27 @@ if len(whatsappData):
 
             #message = input('Please enter the message you want to send on the group:\n')
             #message = y['Message']
-
+            
+            #Sending mongodb message
             dataDict = {"to_number": groupId,"type": "text","message": message}
             sendMsg = requests.post(url2, headers = headers, data = json.dumps(dataDict))
             sendMsgJson = sendMsg.json()
             print(sendMsgJson)
 
-            # url3 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10236/group/promote'
-            # headers = {'x-maytapi-key': 'fc6434c6-fc38-4eaa-87f1-b928f2ecdc84','Content-Type':'application/json','accept':'application/json'}
-            # adminNo = adminNo + '@c.us'
-            # data_Dict = {"conversation_id": groupId,"number": adminNo}
-            # #print(json.dumps(dataDict))
-            # promoteMember = requests.post(url3, headers = headers, data = json.dumps(data_Dict))
-            # promoteMemberJson = promoteMember.json()
-            #print(promoteMemberJson)
+            #Sending enterd message
+            dataDict = {"to_number": groupId,"type": "text","message": messageSend}
+            sendMsg = requests.post(url2, headers = headers, data = json.dumps(dataDict))
+            sendMsgJson = sendMsg.json()
+            print(sendMsgJson)
+
+            url3 = 'https://api.maytapi.com/api/e7fc0a51-09c8-48fe-b689-412d7f533ce4/10236/group/promote'
+            headers = {'x-maytapi-key': 'fc6434c6-fc38-4eaa-87f1-b928f2ecdc84','Content-Type':'application/json','accept':'application/json'}
+            adminNo = adminNo + '@c.us'
+            data_Dict = {"conversation_id": groupId,"number": adminNo}
+            #print(json.dumps(dataDict))
+            promoteMember = requests.post(url3, headers = headers, data = json.dumps(data_Dict))
+            promoteMemberJson = promoteMember.json()
+            print(promoteMemberJson)
             
             print("----1 group created----")
             print("GroupName : ", GroupName)
